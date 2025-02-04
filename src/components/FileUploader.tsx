@@ -10,9 +10,17 @@ import { FileUploaderProps } from "@/types";
 export default function FileUploader({
   maxFiles = 5,
   maxSize = 4,
-  inputClassName,
-  onUpload,
   allowedFiles = ["any"],
+  onUpload,
+  previewClassName,
+  dropZoneClassName,
+  dropZoneLabelClassName,
+  errorClassName,
+  fileItemClassName,
+  uploadButtonClassName,
+  loadingClassName,
+  deleteButtonClassName,
+  closePreviewButtonClassName,
 }: FileUploaderProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -89,8 +97,8 @@ export default function FileUploader({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={twMerge(
-          "flex flex-col items-center justify-center h-48 w-80 border-2 border-dashed border-gray-400 rounded-lg cursor-pointer",
-          inputClassName
+          "flex flex-col items-center justify-center h-48 w-80 border-2 border-dashed border-gray-400 rounded-lg cursor-pointer group",
+          dropZoneClassName
         )}
       >
         <input
@@ -103,7 +111,10 @@ export default function FileUploader({
         />
         <label
           htmlFor="fileInput"
-          className="flex flex-col items-center text-center text-gray-500 hover:text-blue-500 cursor-pointer"
+          className={twMerge(
+            "flex flex-col items-center text-center text-gray-500 hover:text-blue-500 cursor-pointer transition",
+            dropZoneLabelClassName
+          )}
         >
           <UploadIcon />
           <p>
@@ -118,7 +129,12 @@ export default function FileUploader({
       </div>
 
       {error && (
-        <div className="mt-2 bg-red-100 text-red-600 border border-red-200 p-2 rounded-lg flex justify-between items-center">
+        <div
+          className={twMerge(
+            "mt-2 bg-red-100 text-red-600 border border-red-200 p-2 rounded-lg flex justify-between items-center",
+            errorClassName // Custom error class
+          )}
+        >
           <span>{error}</span>
           <button onClick={() => setError(null)} className="font-bold ml-1 text-red-600">
             <XIcon />
@@ -131,12 +147,15 @@ export default function FileUploader({
           {files.map((file, index) => (
             <div
               key={index}
-              className="relative group cursor-pointer"
+              className={twMerge("relative group cursor-pointer", fileItemClassName)} // Custom file item class
               onClick={() => handlePreview(file)}
             >
               {renderFile(file)}
               <button
-                className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-red-500 text-white rounded-full p-1 hidden group-hover:block"
+                className={twMerge(
+                  "absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-red-500 text-white rounded-full p-1 hidden group-hover:block transition",
+                  deleteButtonClassName // Custom delete button class
+                )}
                 onClick={(e) => {
                   e.stopPropagation();
                   removeFile(index);
@@ -151,10 +170,16 @@ export default function FileUploader({
 
       {(previewFile && previewFileUrl) && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded-lg relative">
+          <div className={twMerge(
+            "bg-white p-4 rounded-lg relative",
+            previewClassName
+          )}>
             <button
               onClick={closePreview}
-              className="absolute p-0.5 top-0 right-0 translate-x-1/3 -translate-y-1/3 transition bg-gray-200 hover:bg-gray-300 text-gray-600 hover:text-black rounded-full"
+              className={twMerge(
+                "absolute p-0.5 top-0 right-0 translate-x-1/3 -translate-y-1/3 transition bg-gray-200 hover:bg-gray-300 text-gray-600 hover:text-black rounded-full",
+                closePreviewButtonClassName // Custom close preview button class
+              )}
             >
               <XIcon />
             </button>
@@ -168,13 +193,16 @@ export default function FileUploader({
           <button
             onClick={handleUpload}
             disabled={isUploading}
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-blue-300"
+            className={twMerge(
+              "px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-blue-300 transition",
+              uploadButtonClassName // Custom upload button class
+            )}
           >
             {isUploading ? "Uploading..." : "Upload"}
           </button>
 
           {isUploading && (
-            <div className="w-full mt-2 h-2 bg-gray-200 rounded-lg overflow-hidden">
+            <div className={twMerge("w-full mt-2 h-2 bg-gray-200 rounded-lg overflow-hidden", loadingClassName)}>
               <div className="h-full bg-blue-500 animate-pulse"></div>
             </div>
           )}
